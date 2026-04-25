@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Granted: Batch 2022–2026 🎓</title>
+    <meta name="description" content="A cinematic farewell experience for Batch 2022-2026. Memories unlocked.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Orbitron:wght@400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Background Particles Canvas -->
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- 1. LOADING SCREEN -->
+    <section id="loading-screen" class="screen active">
+        <div class="glitch-wrapper">
+            <div class="loader-content">
+                <div id="loader-text" class="hacker-text">Initializing Memories...</div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                <div class="status-sequence">
+                    <span id="status-line"></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. HERO / UNLOCK SCREEN -->
+    <section id="unlock-screen" class="screen">
+        <div class="content-wrapper">
+            <h1 class="hero-title glitch" data-text="Access Granted: Batch 2022–2026 🎓">Access Granted: Batch 2022–2026
+                🎓</h1>
+            <p class="hero-subtitle">Some memories never log out...</p>
+
+            <div class="input-container">
+                <div class="input-glow"></div>
+                <input type="text" id="unlock-input" placeholder="Enter batch message to unlock..." autocomplete="off">
+                <div class="input-feedback" id="input-feedback"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. MEMORIES SCREEN -->
+    <section id="memories-screen" class="screen">
+        <!-- Fixed Logout Button -->
+        <button id="logout-btn" onclick="handleLogout()" title="Lock & Exit">🔒 Lock</button>
+        <div class="content-wrapper">
+            <h2 class="section-title">🎓 Memories Unlocked</h2>
+
+            <div class="video-container">
+                <img src="./clg grp photo.jpg" alt="Memories" class="static-video-image">
+            </div>
+
+            <div class="action-buttons">
+                <a href="https://youtu.be/9OSdYvnE92c" target="_blank" class="btn btn-primary ripple">
+                    <span>🎬 WATCH VIDEO</span>
+                </a>
+                <button id="download-btn" class="btn btn-secondary">
+                    <span>⬇️ DOWNLOAD MEMORIES</span>
+                    <small>Large file • Use Wi-Fi</small>
+                </button>
+            </div>
+
+            <div class="creator-credit" id="creator-credit">
+                <span class="typing-text">Edited the memories,engineered the experience —Mohamed Fazil</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ripple/Transition Elements -->
+    <div id="flash-overlay"></div>
+    <div id="glitch-overlay"></div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
