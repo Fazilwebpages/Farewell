@@ -1,3 +1,7 @@
+// Timeout refs for drive animation — allows cancellation on tab return
+let driveAnimTimeouts = [];
+let driveStream = null;
+
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Particle Background
     initParticles();
@@ -144,21 +148,33 @@ function startLoading() {
 }
 
 // --- Unlock Logic ---
+const VALID_INPUTS = ["batch 22-26", "batch 2022-2026", "22-26", "farewell batch"];
+
 function setupUnlock() {
     const input = document.getElementById('unlock-input');
-    const feedback = document.getElementById('input-feedback');
-    const validInputs = ["batch 22-26", "batch 2022-2026", "22-26", "farewell batch"];
 
+    // Enter key
     input.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
-            const val = input.value.toLowerCase().trim();
-            if (validInputs.includes(val)) {
-                handleSuccess();
-            } else {
-                handleError();
-            }
+            validateUnlock();
         }
     });
+
+    // Unlock button click
+    const unlockBtn = document.getElementById('unlock-btn');
+    if (unlockBtn) {
+        unlockBtn.addEventListener('click', validateUnlock);
+    }
+}
+
+function validateUnlock() {
+    const input = document.getElementById('unlock-input');
+    const val = input.value.toLowerCase().trim();
+    if (VALID_INPUTS.includes(val)) {
+        handleSuccess();
+    } else {
+        handleError();
+    }
 }
 
 function handleError() {
@@ -262,15 +278,31 @@ function setupButtons() {
         });
     });
 
-    // Download Button Burst
+    // Download Button — handle tab-return
     const downloadBtn = document.getElementById('download-btn');
 
-    // When user comes back from Drive tab, show "Transfer Complete"
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible' && downloadBtn.dataset.opened === 'true') {
-            // Ensure we stay on memories screen
+            // Cancel any still-running animation timeouts
+            driveAnimTimeouts.forEach(t => clearTimeout(t));
+            driveAnimTimeouts = [];
+
+            // Remove the data-stream overlay if still present
+            if (driveStream) {
+                driveStream.remove();
+                driveStream = null;
+            }
+
+            // Reset button text first, then show complete state
+            const span = document.getElementById('download-btn-text');
+            const sub  = document.getElementById('download-btn-sub');
+            span.innerText = '📂 VIEW & DOWNLOAD';
+            sub.innerText  = 'Drive Link';
+            downloadBtn.classList.remove('loading');
+            downloadBtn.style.pointerEvents = 'auto';
+
+            // Stay on memories screen
             transitionToScreen('memories-screen');
-            // Mark complete
             downloadBtn.dataset.opened = 'false';
             downloadBtn.dataset.complete = 'true';
             setTransferComplete();
@@ -300,12 +332,12 @@ function setTransferComplete() {
 function handleDriveClick(e) {
     const downloadBtn = document.getElementById('download-btn');
 
-    // If already marked complete, just let the link open normally
+    // If already marked complete, let link open without any animation
     if (downloadBtn.dataset.complete === 'true') {
         return;
     }
 
-    // Mark that we opened the tab so visibilitychange knows to react
+    // Mark that we've opened the Drive tab
     downloadBtn.dataset.opened = 'true';
 
     const span = document.getElementById('download-btn-text');
@@ -318,22 +350,30 @@ function handleDriveClick(e) {
         createParticleBurst(centerX, centerY);
     }
 
-    // Sci-fi loading states (runs while Drive opens in new tab)
+    // Sci-fi loading animation — store refs so we can cancel on tab return
     downloadBtn.classList.add('loading');
     span.innerText = 'ESTABLISHING LINK...';
     downloadBtn.style.pointerEvents = 'none';
 
-    const stream = document.createElement('div');
-    stream.className = 'data-stream';
-    document.body.appendChild(stream);
+    driveStream = document.createElement('div');
+    driveStream.className = 'data-stream';
+    document.body.appendChild(driveStream);
 
-    setTimeout(() => {
-        span.innerText = 'OPENING DRIVE...';
-        setTimeout(() => {
-            stream.remove();
-            downloadBtn.style.pointerEvents = 'auto';
+    const t1 = setTimeout(() => {
+        // Only update text if NOT already back (dataset.opened still true)
+        if (downloadBtn.dataset.opened === 'true') {
+            span.innerText = 'OPENING DRIVE...';
+        }
+        const t2 = setTimeout(() => {
+            if (driveStream) { driveStream.remove(); driveStream = null; }
+            if (downloadBtn.dataset.opened === 'true') {
+                downloadBtn.style.pointerEvents = 'auto';
+                span.innerText = '📂 VIEW & DOWNLOAD';
+            }
         }, 1500);
+        driveAnimTimeouts.push(t2);
     }, 1000);
+    driveAnimTimeouts.push(t1);
 }
 
 function createParticleBurst(x, y) {

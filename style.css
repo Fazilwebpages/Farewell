@@ -159,7 +159,7 @@ canvas {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     padding: 15px 20px;
-    border-radius: 12px;
+    border-radius: 12px 0 0 12px;
     color: #fff;
     font-size: 1rem;
     outline: none;
@@ -171,6 +171,52 @@ canvas {
 #unlock-input:focus {
     border-color: var(--accent-blue);
     box-shadow: 0 0 20px rgba(0, 210, 255, 0.3);
+    border-radius: 12px 0 0 12px;
+}
+
+/* Input + Button Row */
+.input-row {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+}
+
+/* Unlock Submit Button */
+#unlock-btn {
+    flex-shrink: 0;
+    width: 52px;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    border: none;
+    border-radius: 0 12px 12px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 12px rgba(0, 210, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+#unlock-btn svg {
+    width: 20px;
+    height: 20px;
+    color: #fff;
+    stroke: #fff;
+    transition: transform 0.2s ease;
+}
+
+#unlock-btn:hover {
+    box-shadow: 0 0 25px rgba(0, 210, 255, 0.6);
+    transform: scale(1.05);
+}
+
+#unlock-btn:hover svg {
+    transform: scale(1.15);
+}
+
+#unlock-btn:active {
+    transform: scale(0.97);
 }
 
 .input-glow {
@@ -223,7 +269,7 @@ canvas {
     overflow-y: auto;
     padding-top: 60px;
     padding-bottom: 80px;
-    background: radial-gradient(circle at top, #0a1128 0%, #05070a 100%);
+    background: transparent;
 }
 
 .section-title {
