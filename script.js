@@ -264,47 +264,76 @@ function setupButtons() {
 
     // Download Button Burst
     const downloadBtn = document.getElementById('download-btn');
-    downloadBtn.addEventListener('click', () => {
-        const rect = downloadBtn.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
 
-        // 1. Particle Burst
-        for (let i = 0; i < 40; i++) {
-            createParticleBurst(centerX, centerY);
+    // When user comes back from Drive tab, show "Transfer Complete"
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && downloadBtn.dataset.opened === 'true') {
+            // Ensure we stay on memories screen
+            transitionToScreen('memories-screen');
+            // Mark complete
+            downloadBtn.dataset.opened = 'false';
+            downloadBtn.dataset.complete = 'true';
+            setTransferComplete();
         }
-
-        // 2. Sci-fi Transfer Effect
-        downloadBtn.classList.add('loading');
-        const originalText = downloadBtn.querySelector('span').innerText;
-        downloadBtn.querySelector('span').innerText = "ESTABLISHING UPLINK...";
-        downloadBtn.style.pointerEvents = "none";
-
-        // Create a temporary data stream effect
-        const stream = document.createElement('div');
-        stream.className = 'data-stream';
-        document.body.appendChild(stream);
-
-        setTimeout(() => {
-            downloadBtn.querySelector('span').innerText = "DOWNLOADING MEMORIES...";
-            
-            setTimeout(() => {
-                downloadBtn.querySelector('span').innerText = "TRANSFER COMPLETE";
-                stream.remove();
-                
-                // Final Ripple
-                const flash = document.getElementById('flash-overlay');
-                flash.style.backgroundColor = 'rgba(0, 210, 255, 0.2)';
-                flash.style.opacity = '1';
-                
-                setTimeout(() => {
-                    flash.style.opacity = '0';
-                    alert("The vault is open. Your memories are being downloaded...");
-                    window.location.href = "https://youtu.be/9OSdYvnE92c"; 
-                }, 500);
-            }, 2000);
-        }, 1500);
     });
+}
+
+function setTransferComplete() {
+    const downloadBtn = document.getElementById('download-btn');
+    const span = document.getElementById('download-btn-text');
+    const sub = document.getElementById('download-btn-sub');
+
+    span.innerText = '✅ TRANSFER COMPLETE';
+    sub.innerText = 'Memories delivered';
+    downloadBtn.classList.remove('loading');
+    downloadBtn.style.pointerEvents = 'auto';
+    downloadBtn.style.borderColor = 'var(--accent-blue)';
+    downloadBtn.style.boxShadow = '0 0 20px rgba(0, 210, 255, 0.4)';
+
+    // Cyan flash effect
+    const flash = document.getElementById('flash-overlay');
+    flash.style.backgroundColor = 'rgba(0, 210, 255, 0.15)';
+    flash.style.opacity = '1';
+    setTimeout(() => { flash.style.opacity = '0'; }, 600);
+}
+
+function handleDriveClick(e) {
+    const downloadBtn = document.getElementById('download-btn');
+
+    // If already marked complete, just let the link open normally
+    if (downloadBtn.dataset.complete === 'true') {
+        return;
+    }
+
+    // Mark that we opened the tab so visibilitychange knows to react
+    downloadBtn.dataset.opened = 'true';
+
+    const span = document.getElementById('download-btn-text');
+    const rect = downloadBtn.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    // Particle burst
+    for (let i = 0; i < 40; i++) {
+        createParticleBurst(centerX, centerY);
+    }
+
+    // Sci-fi loading states (runs while Drive opens in new tab)
+    downloadBtn.classList.add('loading');
+    span.innerText = 'ESTABLISHING LINK...';
+    downloadBtn.style.pointerEvents = 'none';
+
+    const stream = document.createElement('div');
+    stream.className = 'data-stream';
+    document.body.appendChild(stream);
+
+    setTimeout(() => {
+        span.innerText = 'OPENING DRIVE...';
+        setTimeout(() => {
+            stream.remove();
+            downloadBtn.style.pointerEvents = 'auto';
+        }, 1500);
+    }, 1000);
 }
 
 function createParticleBurst(x, y) {
